@@ -1,0 +1,294 @@
+/* POPPINS FONT */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost&family=Roboto:wght@400;500;700&display=swap');
+
+
+*{
+    font-family: 'Poppins', sans-serif;
+}
+.wrapper{
+    background: #ececec;
+    padding: 0 20px 0 20px;
+}
+.main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.side-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('../images/login_img.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 10px 0 0 10px;
+    position: relative;
+}
+
+.swal2-popup {
+    font-family: 'Roboto', sans-serif;
+}
+
+.swal2-confirm {
+    background-color: #204A3D !important;
+}
+
+.col-md-6.side-image.forgot,.col-md-6.side-image.factor {
+    background: #F9F4F4;
+}
+
+.col-md-6.side-image.factor header {
+    font-size: 1.7rem;
+}
+
+
+.logo img {
+     width: 175px;
+    height: auto;
+    margin-top: 40%;
+    margin-left: 25%;
+}
+
+.logo.forgot img {
+    width: 420px;
+    height: auto;
+    margin: auto;
+    margin-top: 15%;
+}
+
+.top_logo.forgot img{
+    width: 70px;
+    height: auto;
+   margin-left: 7   0%;
+}
+
+
+.row{
+  width: 975px;
+  height: 640px;
+  border-radius: 10px;
+  background: #FDFDFD;
+  padding: 0px;
+  box-shadow: 5px 5px 10px 1px rgba(0,0,0,0.2);
+}
+.text{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.text p{
+    color: #fff;
+    font-size: 20px; 
+}
+i{
+    font-weight: 400;
+    font-size: 15px;
+}
+.right{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.input-box{
+  width: 330px;
+  box-sizing: border-box;
+}
+img{
+    width: 35px;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+.input-box header{
+    font-weight: 700;
+    font-size: 2.5rem;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    
+}
+
+.input-box p{
+    margin-bottom: 45px;
+    text-align: center;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+}
+
+
+.input-field{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 0 10px 0 10px;
+}
+.input{
+    height: 45px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    outline: none;
+    margin-bottom: 20px;
+    color: #40414a;
+}
+.input-box .input-field label{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 16px;
+    pointer-events: none;
+    color: rgba(0, 0, 0, 0.6);
+    transition: .5s;
+}
+
+.input-box .input-field label i{
+   font-size: 12px;
+}
+
+.input-field input:focus ~ label
+   {
+    top: -10px;
+    font-size: 13px;
+  }
+  .input-field input:valid ~ label
+  {
+   top: -10px;
+   font-size: 13px;
+   color: #204A3D;
+ }
+
+ .input-box .input-field label i.fa.fa-lock {
+    font-size: 14px;
+}
+ .input-field .input:focus, .input-field .input:valid{
+    border-bottom: 1px solid #204A3D;
+ }
+ .submit{
+    border: none;
+    outline: none;
+    height: 45px;
+    background: #204A31E5;
+    color: #fff;
+    border-radius: 25px;
+    transition: .4s;
+ }
+ .submit:hover{
+    background: #A88C0A;
+    color: #fff;
+ }
+ .signin{
+    text-align: left;
+    font-size: small;
+    margin-bottom: 25px;
+}
+span a{
+    text-decoration: none;
+    color: #0B72BD;
+    transition: .5s;
+}
+span a:hover{
+    text-decoration: underline;
+    color: #000;
+}
+
+
+.backsgnin {
+    text-align: center;
+    margin-top: 20px;
+    
+}
+
+.backsgnin a{
+    color: rgba(0, 0, 0, 0.6);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+
+.backsgnin i{
+    font-size: 11px;
+}
+
+form.factor {
+    display: flex;
+    margin: auto;
+    margin-bottom: 45px;
+    gap: 10px; 
+}
+
+
+/* Default style for the input */
+.col-md-6.side-image.factor .input-field input[type="text"] {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+    text-align: center;
+    margin-right: 5px;
+    border: 2px solid rgba(0, 0, 0, 0.2); /* Default border color */
+    border-radius: 2px;
+    transition: border-color 0.3s ease;
+    outline: none; /* Remove default focus outline */
+}
+
+/* Style for the input when it's focused */
+.col-md-6.side-image.factor .input-field input[type="text"]:focus {
+    border-color: #000 !important; /* Border color when focused */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+/* Style for the input when it's not empty */
+.col-md-6.side-image.factor .input-field input[type="text"]:not(:valid) {
+    border-color: #000; /* Green color when empty */
+}
+
+.col-md-6.side-image.factor .input-field input[type="text"]:valid {
+    border-color: rgba(0, 0, 0, 0.2); /* Red color when not empty */
+}
+
+.col-md-6.side-image.factor p span {
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.col-md-6.side-image.factor .input-box p.resend{
+    margin-bottom: 0px;
+    margin-top: 20px;
+
+}
+
+.col-md-6.side-image.factor a {
+    text-decoration: none;
+    color: #000;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+
+@media only screen and (max-width: 768px){
+    .side-image{
+        border-radius: 10px 10px 0 0;
+    }
+    img{
+        width: 35px;
+        position: absolute;
+        top: 20px;
+        left: 47%;
+    }
+    .text{
+        position: absolute;
+        top: 70%;
+        text-align: center;
+    }
+    .text p, i{
+        font-size: 16px;
+    }
+    .row{
+        max-width:420px;
+        width: 100%;
+    }
+}
