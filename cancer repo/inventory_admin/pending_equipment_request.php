@@ -1,139 +1,206 @@
 <?php include('includes/header.php')?>
 <?php include('../includes/session.php')?>
+
+<?php
+$host = "host=db.tcfwwoixwmnbwfnzchbn.supabase.co port=5432 dbname=postgres user=postgres password=sbit4e-4thyear-capstone-2023";
+
+try {
+    $dbh = new PDO("pgsql:" . $host);
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    if (isset($_GET['delete'])) {
+        $delete_request_id = $_GET['delete'];
+
+        $deleteQuery = $dbh->prepare("DELETE FROM hr_equipment_request WHERE id = :id");
+        $deleteQuery->bindParam(':id', $delete_request_id);
+        $deleteQuery->execute();
+
+        echo "<script>alert('Equipment request deleted Successfully');</script>";
+        echo "<script type='text/javascript'> document.location = 'pending_equipment_request.php'; </script>";
+    }
+
+    if (isset($_GET['approve'])) {
+        $approved_request_id = $_GET['approve'];
+
+        $updateStatusQuery = $dbh->prepare("UPDATE hr_equipment_request SET status = 'Approved' WHERE id = :id");
+
+        $updateStatusQuery->bindParam(':id', $approved_request_id);
+        $updateStatusQuery->execute();
+
+        echo "<script>alert('Status updated to Approved');</script>";
+        echo "<script type='text/javascript'> document.location = 'pending_equipment_request.php'; </script>";
+    }
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+}
+?>
+
+
+
+
+
+
+<style>
+.action-btn {
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.btn-approve {
+    background-color: #198754;
+    color: #fff;
+    border: none;
+}
+
+.btn-reject {
+    background-color: #DC3545;
+    color: #fff;
+    border: none;
+}
+</style>
+
 <body>
-	<div class="pre-loader">
-		<div class="pre-loader-box">
-			<div class="loader-logo"><img src="../vendors/images/logo.png" alt=""></div>
-			<div class='loader-progress' id="progress_div">
-				<div class='bar' id='bar1'></div>
-			</div>
-			<div class='percent' id='percent1'>0%</div>
-			<div class="loading-text">
-				Loading...
-			</div>
-		</div>
-	</div>
+    <div class="pre-loader">
+        <div class="pre-loader-box">
+            <div class="loader-logo"><img src="../vendors/images/logo.png" alt=""></div>
+            <div class='loader-progress' id="progress_div">
+                <div class='bar' id='bar1'></div>
+            </div>
+            <div class='percent' id='percent1'>0%</div>
+            <div class="loading-text">
+                Loading...
+            </div>
+        </div>
+    </div>
 
-	<?php include('includes/navbar.php')?>
+    <?php include('includes/navbar.php')?>
 
-	<?php include('includes/right_sidebar.php')?>
+    <?php include('includes/right_sidebar.php')?>
 
-	<?php include('includes/left_sidebar.php')?>
+    <?php include('includes/left_sidebar.php')?>
 
-	<div class="mobile-menu-overlay"></div>
+    <div class="mobile-menu-overlay"></div>
 
-	<div class="main-container">
-		<div class="pd-ltr-20">
-			<div class="page-header">
-				<div class="row">
-					<div class="col-md-6 col-sm-12">
-							<div class="title">
-								<h4>Leave Portal</h4>
-							</div>
-							<nav aria-label="breadcrumb" role="navigation">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="admin_dashboard.php">Dashboard</a></li>
-									<li class="breadcrumb-item active" aria-current="page">Pending Leave</li>
-								</ol>
-							</nav>
-					</div>
-				</div>
-			</div>
+    <div class="main-container">
+        <div class="pd-ltr-20">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="title">
+                            <h4>Leave Portal</h4>
+                        </div>
+                        <nav aria-label="breadcrumb" role="navigation">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="admin_dashboard.php">Dashboard</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Pending Leave</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
 
-			<div class="card-box mb-30">
-				<div class="pd-20">
-						<h2 class="text-blue h4">PENDING EQUIPMENT REQUEST</h2>
-					</div>
-				<div class="pb-20">
-					<table class="data-table table stripe hover nowrap">
-						<thead>
-							<tr>
-								<th class="table-plus datatable-nosort">STAFF NAME</th>
-								<th>LEAVE TYPE</th>
-								<th>APPLIED DATE</th>
-								<th>HOD STATUS</th>
-								<th>REG. STATUS</th>
-								<th class="datatable-nosort">ACTION</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
+            <div class="card-box mb-30">
+                <div class="pd-20">
+                    <h2 class="text-blue h4">PENDING EQUIPMENT REQUEST</h2>
+                </div>
+                <div class="pb-20">
+                    <table class="data-table table stripe hover nowrap" text-align: center;>
+                        <thead>
+                            <tr>
+                                <th class="table-plus datatable-nosort">EQUIPMENT CATEGORY</th>
+                                <th>QUANTITY</th>
+                                <th>DATE OF REQUEST</th>
+                                <th>EMPLOYEE NAME</th>
+                                <th>DEPARTMENT</th>
+                                <th class="datatable-nosort">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
 
-								<?php 
-								$status=1;
-								$reg_status=0;
-								$sql = "SELECT tblleaves.id as lid,tblemployees.FirstName,tblemployees.LastName,tblemployees.location,tblemployees.emp_id,tblleaves.LeaveType,tblleaves.PostingDate,tblleaves.Status, tblleaves.admin_status from tblleaves join tblemployees on tblleaves.empid=tblemployees.emp_id where tblleaves.Status= '$status' and tblleaves.admin_status = '$reg_status' order by lid desc";
-									$query = mysqli_query($conn, $sql) or die(mysqli_error());
-									while ($row = mysqli_fetch_array($query)) {
-								 ?>  
+                                <?php 
+								$status = "Pending";
+								$query = $dbh->prepare("
+								SELECT hr_equipment_request.id AS lid, hr_equipment_request.equipment_category,hr_equipment_request.quantity, hr_equipment_request.posting_date,hr_equipment_request.status,hr_employees.first_name,hr_employees.last_name,hr_employees.department
+								FROM hr_equipment_request
+								JOIN hr_employees ON hr_equipment_request.emp_id = hr_employees.emp_id
+								WHERE hr_equipment_request.status = :status
+								ORDER BY lid DESC
+								LIMIT 10;
+								");
+								$query->bindParam(':status', $status);
+								$query->execute();
 
-								<td class="table-plus">
-									<div class="name-avatar d-flex align-items-center">
-										<div class="avatar mr-2 flex-shrink-0">
-											<img src="<?php echo (!empty($row['location'])) ? '../uploads/'.$row['location'] : '../uploads/NO-IMAGE-AVAILABLE.jpg'; ?>" class="border-radius-100 shadow" width="40" height="40" alt="">
-										</div>
-										<div class="txt">
-											<div class="weight-600"><?php echo $row['FirstName']." ".$row['LastName'];?></div>
-										</div>
-									</div>
-								</td>
-								<td><?php echo $row['LeaveType']; ?></td>
-	                            <td><?php echo $row['PostingDate']; ?></td>
-								<td><?php $stats=$row['Status'];
-	                             if($stats==1){
-	                              ?>
-	                                  <span style="color: green">Approved</span>
-	                                  <?php } if($stats==2)  { ?>
-	                                 <span style="color: red">Rejected</span>
-	                                  <?php } if($stats==0)  { ?>
-	                             <span style="color: blue">Pending</span>
-	                             <?php } ?>
-	                            </td>
-	                            <td><?php $stats=$row['admin_status'];
-	                             if($stats==1){
-	                              ?>
-	                                  <span style="color: green">Approved</span>
-	                                  <?php } if($stats==2)  { ?>
-	                                 <span style="color: red">Rejected</span>
-	                                  <?php } if($stats==0)  { ?>
-	                             <span style="color: blue">Pending</span>
-	                             <?php } ?>
-	                            </td>
-								<td>
-									<div class="table-actions">
-										<a title="VIEW" href="leave_details.php?leaveid=<?php echo $row['lid'];?>"><i class="dw dw-eye" data-color="#265ed7"></i></a>	
-									</div>
-								</td>
-							</tr>
-							<?php }?>
-						</tbody>
-					</table>
-			   </div>
-			</div>
+								while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
 
-			<?php include('includes/footer.php'); ?>
-		</div>
-	</div>
-	<!-- js -->
+								?>
 
-	<script src="../vendors/scripts/core.js"></script>
-	<script src="../vendors/scripts/script.min.js"></script>
-	<script src="../vendors/scripts/process.js"></script>
-	<script src="../vendors/scripts/layout-settings.js"></script>
-	<script src="../src/plugins/apexcharts/apexcharts.min.js"></script>
-	<script src="../src/plugins/datatables/js/jquery.dataTables.min.js"></script>
-	<script src="../src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
-	<script src="../src/plugins/datatables/js/dataTables.responsive.min.js"></script>
-	<script src="../src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+                                <td class="table-plus">
 
-	<!-- buttons for Export datatable -->
-	<script src="../src/plugins/datatables/js/dataTables.buttons.min.js"></script>
-	<script src="../src/plugins/datatables/js/buttons.bootstrap4.min.js"></script>
-	<script src="../src/plugins/datatables/js/buttons.print.min.js"></script>
-	<script src="../src/plugins/datatables/js/buttons.html5.min.js"></script>
-	<script src="../src/plugins/datatables/js/buttons.flash.min.js"></script>
-	<script src="../src/plugins/datatables/js/vfs_fonts.js"></script>
-	
-	<script src="../vendors/scripts/datatable-setting.js"></script></body>
+                                    <?php echo $row['equipment_category']; ?></td>
+                                <td><?php echo $row['quantity']; ?></td>
+                                <td><?php echo $row['posting_date']; ?></td>
+                                <td><?php echo $row['first_name'] . " " . $row['last_name'];?></td>
+                                <td><?php echo $row['department']; ?></td>
+
+
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="action-btn btn-approve"
+                                            onclick="ApprovedItem(<?php echo htmlentities($row['lid']); ?>)">Approve</button>
+
+                                        <button class="action-btn btn-reject"
+                                            onclick="deleteItem(<?php echo htmlentities($row['lid']); ?>)">Reject</button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php }?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <?php include('includes/footer.php'); ?>
+        </div>
+    </div>
+    <!-- js -->
+    <script>
+    function deleteItem(itemId) {
+        if (confirm('Are you sure you want to Delete this Request?')) {
+            window.location.href = 'pending_equipment_request.php?delete=' + itemId;
+        }
+    }
+
+    function ApprovedItem(itemId) {
+        if (confirm('Are you sure you want to Approve this Request?')) {
+            window.location.href = 'pending_equipment_request.php?approve=' + itemId;
+        }
+    }
+    </script>
+
+    <script src="../vendors/scripts/core.js"></script>
+    <script src="../vendors/scripts/script.min.js"></script>
+    <script src="../vendors/scripts/process.js"></script>
+    <script src="../vendors/scripts/layout-settings.js"></script>
+    <script src="../src/plugins/apexcharts/apexcharts.min.js"></script>
+    <script src="../src/plugins/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="../src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
+    <script src="../src/plugins/datatables/js/dataTables.responsive.min.js"></script>
+    <script src="../src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+
+    <!-- buttons for Export datatable -->
+    <script src="../src/plugins/datatables/js/dataTables.buttons.min.js"></script>
+    <script src="../src/plugins/datatables/js/buttons.bootstrap4.min.js"></script>
+    <script src="../src/plugins/datatables/js/buttons.print.min.js"></script>
+    <script src="../src/plugins/datatables/js/buttons.html5.min.js"></script>
+    <script src="../src/plugins/datatables/js/buttons.flash.min.js"></script>
+    <script src="../src/plugins/datatables/js/vfs_fonts.js"></script>
+
+    <script src="../vendors/scripts/datatable-setting.js"></script>
 </body>
+</body>
+
 </html>

@@ -2,15 +2,18 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <!-- Other head elements -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	<link rel="stylesheet" type="text/css" href="vendors/styles/stylelogin.css">
+    <link rel="stylesheet" type="text/css" href="vendors/styles/stylelogin.css">
 </head>
+
 <body>
     <!-- Rest of your HTML content -->
 </body>
+
 </html>
 
 
@@ -25,79 +28,62 @@ require '../vendor/autoload.php';
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $emp_id=$session_id;
+    $emp_id = $session_id;
     $lid = isset($_POST['lid']) ? $_POST['lid'] : '';
     $recipientEmail = isset($_POST['EmailId']) ? $_POST['EmailId'] : '';
     $newPassword = isset($_POST['password']) ? $_POST['password'] : '';
     $name = isset($_POST['name']) ? $_POST['name'] : '';
     $date = date("Y-m-d");
-    $activity = $name." "."password changed";   
+    $activity = $name . " " . "password changed";
 
-
-    $md5password=md5($newPassword); 
-  
-
-
-
-
+    $md5password = md5($newPassword);
 
     // Replace these with your database connection details
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "doh";
+    $host = "pgsql:host=db.tcfwwoixwmnbwfnzchbn.supabase.co;port=5432;dbname=postgres;user=postgres;password=sbit4e-4thyear-capstone-2023";
 
     try {
         // Create a PDO connection
-       $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $dbh = new PDO($host);
 
-    // Start a transaction
-    $conn->beginTransaction();
+        $dbh->beginTransaction();
 
-    // Update tblemployees password
-    $updatePasswordQuery = "UPDATE hr_employees SET Password = :newPassword WHERE email_id = :recipientEmail";
-    $queryPassword = $conn->prepare($updatePasswordQuery);
-    $queryPassword->bindParam(':newPassword', $md5password);
-    $queryPassword->bindParam(':recipientEmail', $recipientEmail);
-    $queryPassword->execute();
+        // Update hr_employees table with the new password
+        $updatePasswordQuery = "UPDATE hr_employees SET password = :newPassword WHERE email_id = :recipientEmail";
+        $queryPassword = $dbh->prepare($updatePasswordQuery);
+        $queryPassword->bindParam(':newPassword', $md5password);
+        $queryPassword->bindParam(':recipientEmail', $recipientEmail);
+        $queryPassword->execute();
 
-    // Update tblpassrequest status
-    $isread = 1; // Set your value here 
-    $updateTblpassrequest = "UPDATE hr_password_request SET status = :isread WHERE id = :lid";
-    $queryStatus = $conn->prepare($updateTblpassrequest);
-    $queryStatus->bindParam(':isread', $isread, PDO::PARAM_INT);
-    $queryStatus->bindParam(':lid', $lid);
-    $queryStatus->execute();
+        // Update hr_password_request status
+        $isread = 1; // Set your value here 
+        $updateTblpassrequest = "UPDATE hr_password_request SET status = :isread WHERE id = :lid";
+        $queryStatus = $dbh->prepare($updateTblpassrequest);
+        $queryStatus->bindParam(':isread', $isread, PDO::PARAM_INT);
+        $queryStatus->bindParam(':lid', $lid);
+        $queryStatus->execute();
 
-    // Fetch FirstName from Employees table based on id
+        // Fetch FirstName from hr_employees table based on emp_id
+        $fetchFirstNameQuery = "SELECT first_name FROM hr_employees WHERE emp_id = :emp_id";
+        $stmt = $dbh->prepare($fetchFirstNameQuery);
+        $stmt->bindParam(':emp_id', $emp_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $firstName = $result['first_name'];
 
-
-    $fetchFirstNameQuery = "SELECT first_name FROM hr_employees WHERE emp_id = ?";
-    $stmt = $conn->prepare($fetchFirstNameQuery);
-    $stmt->bindParam(1, $emp_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $firstName = $result['first_name'];
-
-    // Insert into tbllogs
-    $insertTbllogs = "INSERT INTO hr_logs (emp_id, name, date, activity) VALUES (:emp_id, :name, :date, :activity)";
-    $queryLogs = $conn->prepare($insertTbllogs);
-    // Bind your values here
-    $queryLogs->bindParam(':emp_id', $emp_id, PDO::PARAM_INT);
-    $queryLogs->bindParam(':name', $firstName, PDO::PARAM_STR);
-    // Adjust date and activity as needed
-    $date = date("Y-m-d H:i:s");
-    $queryLogs->bindParam(':date', $date, PDO::PARAM_STR);
-    $queryLogs->bindParam(':activity', $activity, PDO::PARAM_STR);
-    // Execute the insert query
-    $queryLogs->execute();
+        // Insert into hr_logs table
+        $insertTbllogs = "INSERT INTO hr_logs (emp_id, name, date, activity) VALUES (:emp_id, :name, :date, :activity)";
+        $queryLogs = $dbh->prepare($insertTbllogs);
+        $queryLogs->bindParam(':emp_id', $emp_id, PDO::PARAM_INT);
+        $queryLogs->bindParam(':name', $firstName, PDO::PARAM_STR);
+        $queryLogs->bindParam(':date', $date, PDO::PARAM_STR);
+        $queryLogs->bindParam(':activity', $activity, PDO::PARAM_STR);
+        $queryLogs->execute();
 
         // Commit the transaction
-        $conn->commit();
+        $dbh->commit();
 
         // Rest of your email sending logic here
-        
+       
         $smtpHost = 'smtp.gmail.com';
         $smtpUsername = 'cancerrepo@gmail.com';
         $smtpPassword = 'tktt olvy wqpt cagv';
@@ -152,51 +138,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
 
-
-
-
-
-
+        // Create a new PHPMailer instance and continue with the email sending logic
+        
     } catch (PDOException $e) {
-        // Roll back the transaction if anything fails
-        $conn->rollBack();
+        // Roll back the transaction if an error occurs
+        $dbh->rollBack();
         echo "Error: " . $e->getMessage();
     }
 
-    // Close the connection
-    $conn = null;
+    // Close the connection (Note: For PDO, connections are closed automatically)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

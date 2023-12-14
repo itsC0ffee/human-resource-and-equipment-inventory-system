@@ -1,20 +1,17 @@
 <?php
 
-define('DB_HOST','localhost');
-define('DB_USER','root');
-define('DB_PASS','');
-define('DB_NAME','doh');
 
-$conn = mysqli_connect('localhost','root','','doh') or die(mysqli_error());
 
-// Establish database connection.
-try
-{
-$dbh = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME,DB_USER, DB_PASS,array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
+$host = "host=db.tcfwwoixwmnbwfnzchbn.supabase.co port=5432 dbname=postgres user=postgres password=sbit4e-4thyear-capstone-2023";
+
+try {
+    $dbh = new PDO("pgsql:" . $host);
+    
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
 }
-catch (PDOException $e)
-{
-exit("Error: " . $e->getMessage());
-}
+
+
+
 
 ?>

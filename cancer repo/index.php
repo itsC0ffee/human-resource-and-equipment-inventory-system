@@ -72,54 +72,52 @@
 <?php
 session_start();
 include('includes/config.php');
-if(isset($_POST['signin']))
-{
-	$username=$_POST['username'];
-	$password=md5($_POST['password']);
 
-	$sql ="SELECT * FROM hr_employees where email_id ='$username' AND Password ='$password'";
-	$query= mysqli_query($conn, $sql);
-	$count = mysqli_num_rows($query);
-	if($count > 0)
-	{
-		while ($row = mysqli_fetch_assoc($query)) {
-		    if ($row['role'] == 'Admin') {
-		    	$_SESSION['alogin']=$row['emp_id'];
-		    	$_SESSION['arole']=$row['Department'];
-			 	echo "<script type='text/javascript'> document.location = 'admin/admin_dashboard.php'; </script>";
-		    }
-		    elseif ($row['role'] == 'Employee') {
-		    	$_SESSION['alogin']=$row['emp_id'];
-		    	$_SESSION['arole']=$row['Department'];
-			 	echo "<script type='text/javascript'> document.location = 'hr_employee/index.php'; </script>";
-		    }
-		    elseif ($row['role'] == 'HOD'){
-		    	$_SESSION['alogin']=$row['emp_id'];
-		    	$_SESSION['arole']=$row['Department'];
-			 	echo "<script type='text/javascript'> document.location = 'heads/index.php'; </script>";
-		    }
-			else {
-				$_SESSION['alogin']=$row['emp_id'];
-		    	$_SESSION['arole']=$row['Department'];
-			 	echo "<script type='text/javascript'> document.location = 'inventory_admin/index.php'; </script>";
-			}
-		}
+if(isset($_POST['signin'])) {
+    $username = $_POST['username'];
+    $password = md5($_POST['password']);
 
-	} 
-	else{
-		echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-		echo "<script>
-		Swal.fire({
-			icon: 'error',
-			title: 'Oops...',
-			text: 'Email or Password Incorrect!',
-			showConfirmButton: true
-		});
-	</script>";
+    $sql = "SELECT * FROM hr_employees WHERE email_id = :username AND password = :password";
+    $stmt = $dbh->prepare($sql);
+    $stmt->bindParam(':username', $username);
+    $stmt->bindParam(':password', $password);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $count = count($result);
 
-	}
-
+    if($count > 0) {
+        foreach ($result as $row) {
+            if ($row['role'] == 'Admin') {
+                $_SESSION['alogin'] = $row['emp_id'];
+                $_SESSION['arole'] = $row['department'];
+                echo "<script type='text/javascript'> document.location = 'admin/admin_dashboard.php'; </script>";
+            } elseif ($row['role'] == 'Employee') {
+                $_SESSION['alogin'] = $row['emp_id'];
+                $_SESSION['arole'] = $row['department'];
+                echo "<script type='text/javascript'> document.location = 'hr_employee/index.php'; </script>";
+            } elseif ($row['role'] == 'HOD') {
+                $_SESSION['alogin'] = $row['emp_id'];
+                $_SESSION['arole'] = $row['department'];
+                echo "<script type='text/javascript'> document.location = 'heads/index.php'; </script>";
+            } else {
+                $_SESSION['alogin'] = $row['emp_id'];
+                $_SESSION['arole'] = $row['department'];
+                echo "<script type='text/javascript'> document.location = 'inventory_admin/index.php'; </script>";
+            }
+        }
+    } else {
+        echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Email or Password Incorrect!',
+                showConfirmButton: true
+            });
+        </script>";
+    }
 }
+
 // $_SESSION['alogin']=$_POST['username'];
 // 	echo "<script type='text/javascript'> document.location = 'changepassword.php'; </script>";
 ?>
